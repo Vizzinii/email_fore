@@ -1,24 +1,22 @@
 <template>
   <div id="app">
-    <Navbar />
-    <router-view />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Navbar from './components/Navbar.vue';
-
 export default {
-  components: {
-    Navbar
-  }
+  name: 'App',
 };
 </script>
 
 <style>
-body {
+#app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  background: url('public/img/background.jpg') no-repeat center center fixed;
-  background-size: cover;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
 }
 </style>
