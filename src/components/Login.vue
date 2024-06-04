@@ -4,7 +4,7 @@
       <form @submit.prevent="login">
         <input v-model="email" type="email" placeholder="Email" required />
         <input v-model="password" type="password" placeholder="Password" required />
-        <button type="submit">Login</button>
+        <button type="submit" @click="loginHandle">Login</button>
       </form>
     </div>
   </template>
@@ -18,11 +18,18 @@
       };
     },
     methods: {
-      login() {
-        // 模拟登录操作
-        this.$router.push('/inbox');
+    loginHandle() {
+      // 简单的示例验证逻辑
+      if (this.email === '888' && this.password === '888') {
+        // 验证成功，跳转到邮箱内部界面
+        this.$router.push('/home');
+      } else {
+        alert('Invalid email or password');
       }
     }
+  }
+    
+   
   };
   </script>
   
