@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
 import { mapActions } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default {
   data() {
@@ -20,7 +20,7 @@ export default {
       email: '',
       password: '',
       loading: false,
-      error: null,
+      error: null
     };
   },
   setup() {
@@ -33,21 +33,20 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        console.log('Logging in with:', this.email, this.password); // 调试信息
         await this.login({ email: this.email, password: this.password });
-        this.router.push('/home');  // 确保正确调用 push 方法
+        this.router.push('/home');
       } catch (err) {
         this.error = 'Invalid email or password';
-        console.error('Login error:', err); // 调试信息
+        console.error('Login error:', err);
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
-<style>
+<style scoped>
 .login {
   max-width: 300px;
   margin: 100px auto;

@@ -11,27 +11,48 @@ export default createStore({
       state.user = user;
       state.isAuthenticated = !!user;
     },
+    clearUser(state) {
+      state.user = null;
+      state.isAuthenticated = false;
+    }
   },
   actions: {
     async login({ commit }, credentials) {
       try {
         const response = await apiClient.post('/users/login', credentials);
-        commit('setUser', response.data);
-        localStorage.setItem('isAuthenticated', true);  // 存储认证状态
+        if (response.status === 200) {
+          commit('setUser', response.data);
+          localStorage.setItem('isAuthenticated', true);
+        } else {
+          throw new Error('Login failed');
+        }
       } catch (error) {
-        console.error('Failed to login', error);
         throw error;
       }
     },
     logout({ commit }) {
-      commit('setUser', null);
+      commit('clearUser');
       localStorage.removeItem('isAuthenticated');
     },
+    async fetchUserIdByEmail({ commit }, email) {
+      try {
+        const response = await apiClient.get('/users/getUserIdByEmail', { params: { email } });
+        return response.data.userId; // 这里修改为userId
+      } catch (error) {
+        throw new Error('Failed to fetch user ID');
+      }
+    }
   },
   getters: {
     isAuthenticated(state) {
       return state.isAuthenticated;
     },
+    userId(state) {
+      return state.user ? state.user.userId : null;
+    },
+    userEmail(state) {
+      return state.user ? state.user.email : null;
+    }
   },
   modules: {},
 });

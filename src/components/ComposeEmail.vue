@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import apiClient from '../utils/axios';
 
 export default {
@@ -38,14 +39,27 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapGetters(['userEmail'])
+  },
+  watch: {
+    userEmail: {
+      handler(email) {
+        this.email.from = email;
+      },
+      immediate: true
+    }
+  },
   methods: {
     async sendEmail() {
+      console.log('Sending email with data:', this.email);
       try {
         const response = await apiClient.post('/mail/send', this.email);
+        console.log('Email sent successfully:', response);
         alert('Email sent!');
         this.$router.push({ name: 'Inbox' });
       } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('Error sending email:', error.response || error.message);
         alert('Failed to send email.');
       }
     },
@@ -56,7 +70,8 @@ export default {
 };
 </script>
 
-  <style scoped>
+
+<style scoped>
   
   
   body, html {

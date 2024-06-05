@@ -1,7 +1,8 @@
 <template>
     <div class="sidebar">
-      <router-link to="/home">收件箱</router-link>
-      <router-link to="/compose">发送</router-link>
+      <router-link to="/home">主页</router-link>
+      <router-link to="/inbox">收件箱</router-link>
+      <router-link to="/compose">发送邮件</router-link>
       <router-link to="/drafts">草稿箱</router-link>
       <router-link to="/trash">回收站</router-link>
     </div>
