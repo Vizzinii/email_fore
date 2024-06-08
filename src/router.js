@@ -9,6 +9,9 @@ import Login from './components/Login.vue';
 import Register from './components/Register.vue';
 import Inbox from './components/Inbox.vue'; // 修改了这里的路径
 import EmailDetail from './components/EmailDetail.vue'; // 修改了这里的路径
+import SentEmails from './components/SentEmails.vue';
+import SentEmailDetail from './components/SentEmailDetail.vue';
+import Attachments from './components/Attachments';
 
 const routes = [
   {
@@ -51,6 +54,21 @@ const routes = [
         path: '/compose',
         name: 'ComposeEmail',
         component: ComposeEmail,
+      },
+      {
+        path: '/sent',
+        name: 'SentEmails', // 新增
+        component: SentEmails
+      },
+      {
+        path: '/sent/email/:emailId',
+        name: 'SentEmailDetail', // 新增
+        component: SentEmailDetail
+      },
+      {
+        path: '/attachments',
+        name: 'Attachments',
+        component: Attachments
       },
       {
         path: '/trash',

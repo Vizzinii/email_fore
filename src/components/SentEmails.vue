@@ -5,7 +5,7 @@
         <div class="email-info">
           <div class="left-section">
             <div :class="['subject', email.read ? 'read' : 'unread']">{{ email.subject }}</div>
-            <div class="from">{{ email.fromEmail }}</div>
+            <div class="to">To: {{ email.toEmail }} </div>
             <div v-if="email.attachment" class="attachment-indicator">📎 附件</div>
           </div>
           <div class="date-status">
@@ -25,7 +25,7 @@ import { mapGetters } from 'vuex';
 import moment from 'moment';
 
 export default {
-  name: 'Inbox',
+  name: 'SentEmails',
   data() {
     return {
       emails: []
@@ -38,46 +38,31 @@ export default {
     }
   },
   methods: {
-    async fetchInbox() {
+    async fetchSentEmails() {
       if (!this.userEmail) {
         console.error('User email not available');
         return;
       }
       try {
         const userId = await this.$store.dispatch('fetchUserIdByEmail', this.userEmail);
-        console.log('Fetching inbox for user ID:', userId);
-        const response = await apiClient.get('/mail/inbox', { params: { toId: userId } });
-        console.log('Inbox response:', response.data);
+        console.log('Fetching sent emails for user ID:', userId);
+        const response = await apiClient.get('/mail/sent', { params: { fromId: userId } });
+        console.log('Sent emails response:', response.data);
         this.emails = response.data;
-        // 检查每封邮件的 read 字段
-        this.emails.forEach(email => {
-          console.log(`Email ID: ${email.emailId}, Subject: ${email.subject}, read: ${email.read}`);
-        });
         console.log('Emails data assigned:', this.emails);
       } catch (error) {
-        console.error('Error fetching inbox:', error);
+        console.error('Error fetching sent emails:', error);
       }
     },
-    async viewEmail(email) {
-      if (!email.read) {
-        try {
-          const response = await apiClient.put(`/mail/read/${email.emailId}`);
-          if (response.status === 200) {
-            email.read = true;
-            this.fetchInbox();
-          }
-        } catch (error) {
-          console.error('Error updating email read status:', error);
-        }
-      }
-      this.$router.push({ name: 'EmailDetail', params: { emailId: email.emailId } });
+    viewEmail(email) {
+      this.$router.push({ name: 'SentEmailDetail', params: { emailId: email.emailId } });
     },
     formatDate(date) {
       return moment(date).format('YYYY-MM-DD HH:mm');
     }
   },
   mounted() {
-    this.fetchInbox();
+    this.fetchSentEmails();
   }
 };
 </script>
@@ -115,7 +100,7 @@ export default {
 .email-info {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* 确保子元素靠左对齐 */
+  align-items: flex-start;
 }
 
 .left-section {
@@ -135,7 +120,7 @@ export default {
   color: gray;
 }
 
-.email-list li .from {
+.email-list li .to {
   margin-left: 10px;
   color: #666;
 }
@@ -147,10 +132,6 @@ export default {
 }
 
 .email-list li .date {
-  color: #666;
-}
-
-.email-list li .status {
   color: #666;
 }
 

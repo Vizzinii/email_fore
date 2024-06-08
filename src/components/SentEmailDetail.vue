@@ -11,7 +11,6 @@
       </div>
       <div class="email-body">{{ email.body }}</div>
       <div class="button-group">
-        <button class="btn btn-primary" @click="reply">回复</button>
         <button class="btn btn-secondary" @click="goBack">返回</button>
       </div>
     </div>
@@ -24,7 +23,7 @@ import apiClient from '../utils/axios';
 import moment from 'moment';
 
 export default {
-  name: 'EmailDetail',
+  name: 'SentEmailDetail',
   data() {
     return {
       email: {
@@ -32,8 +31,7 @@ export default {
         from: '',
         to: '',
         body: '',
-        sentDate: '',
-        attachment: null
+        sentDate: ''
       }
     };
   },
@@ -51,16 +49,7 @@ export default {
       }
     },
     goBack() {
-      this.$router.push({ name: 'Inbox' });
-    },
-    reply() {
-      this.$router.push({
-        name: 'ComposeEmail',
-        query: {
-          to: this.email.fromEmail,
-          subject: `回复: ${this.email.subject}`
-        }
-      });
+      this.$router.push({ name: 'SentEmails' });
     },
     formatDate(date) {
       return moment(date).format('YYYY-MM-DD HH:mm');
@@ -68,6 +57,7 @@ export default {
     getAttachmentUrl(attachmentId) {
       return `http://192.168.237.18:8080/api/attachments/download/${attachmentId}`;
     }
+
   },
   mounted() {
     this.fetchEmailDetail();
@@ -102,20 +92,13 @@ export default {
   margin: 10px 0;
 }
 
-.email-attachment {
-  margin: 20px 0;
-}
-
 .email-body {
   margin: 20px 0;
 }
 
 .button-group {
-  position: absolute;
-  left: 20px;
-  bottom: 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .btn {
@@ -124,15 +107,6 @@ export default {
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
 }
 
 .btn-secondary {

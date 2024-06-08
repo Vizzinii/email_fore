@@ -55,7 +55,7 @@ export default {
 <style>
 .register {
   max-width: 300px;
-  margin: 100px auto;
+  margin: 200px auto;
   padding: 2em;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 5px;
