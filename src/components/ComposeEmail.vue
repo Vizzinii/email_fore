@@ -166,10 +166,9 @@ body, html {
 
 .compose-form {
   background-color: #fff;
-  padding: 20px;
+  padding: 0;
   border-radius: 8px;
-  margin-left: 0px;
-  width: 1400px;
+  width: 100%;
   position: relative;
 }
 
@@ -195,7 +194,7 @@ body, html {
 }
 
 .textarea-field {
-  width: 1500px;
+  width: 100%;
   height: 420px;
   resize: both;
 }
