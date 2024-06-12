@@ -5,9 +5,23 @@
       <p class="email-info"><strong>From:</strong> {{ email.fromEmail }}</p>
       <p class="email-info"><strong>To:</strong> {{ email.toEmail }}</p>
       <p class="email-info"><strong>Date:</strong> {{ formatDate(email.sentDate) }}</p>
-      <div v-if="email.attachment" class="email-attachment">
-        <strong>Attachment:</strong>
-        <a :href="getAttachmentUrl(email.attachment.attachmentId)" target="_blank">{{ email.attachment.fileName }}</a>
+      <div v-if="email.attachment1 || email.attachment2 || email.attachment3" class="email-attachments">
+        <strong>Attachments:</strong>
+        <div v-if="email.attachment1">
+          <a :href="getAttachmentUrl(email.attachment1.attachmentId)" target="_blank">{{
+              email.attachment1.fileName
+            }}</a>
+        </div>
+        <div v-if="email.attachment2">
+          <a :href="getAttachmentUrl(email.attachment2.attachmentId)" target="_blank">{{
+              email.attachment2.fileName
+            }}</a>
+        </div>
+        <div v-if="email.attachment3">
+          <a :href="getAttachmentUrl(email.attachment3.attachmentId)" target="_blank">{{
+              email.attachment3.fileName
+            }}</a>
+        </div>
       </div>
       <div class="email-body">{{ email.body }}</div>
       <div class="button-group">
@@ -19,7 +33,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 import apiClient from '../utils/axios';
 import moment from 'moment';
 
@@ -33,7 +47,9 @@ export default {
         to: '',
         body: '',
         sentDate: '',
-        attachment: null
+        attachment1: null,
+        attachment2: null,
+        attachment3: null
       }
     };
   },
@@ -51,14 +67,14 @@ export default {
       }
     },
     goBack() {
-      this.$router.push({ name: 'Inbox' });
+      this.$router.push({name: 'Inbox'});
     },
     reply() {
       this.$router.push({
         name: 'ComposeEmail',
         query: {
           to: this.email.fromEmail,
-          subject: `回复: ${this.email.subject}`
+          subject: `Re: ${this.email.subject}`
         }
       });
     },
@@ -76,46 +92,72 @@ export default {
 </script>
 
 <style scoped>
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
 .content-container {
   flex-grow: 1;
-  background-color: white;
+  background-color: #f9f9f9;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
   position: absolute;
-  left: 200px;
-  top: 50.8px;
+  left: 15%;
+  top: 60px;
   bottom: 0;
   right: 0;
 }
 
 .email-detail {
-  text-align: left;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 80%;
+  margin: 0 auto;
+  text-align: left; /* 将文本左对齐 */
 }
 
 .email-subject {
   font-size: 24px;
   font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
 }
 
 .email-info {
   margin: 10px 0;
+  color: #666;
 }
 
-.email-attachment {
+.email-attachments {
   margin: 20px 0;
+  color: #333;
+}
+
+.email-attachments a {
+  color: #007bff;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+.email-attachments a:hover {
+  text-decoration: underline;
 }
 
 .email-body {
   margin: 20px 0;
+  white-space: pre-wrap; /* 保持邮件正文中的换行格式 */
+  color: #333;
 }
 
 .button-group {
-  position: absolute;
-  left: 20px;
-  bottom: 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 .btn {
@@ -124,6 +166,7 @@ export default {
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .btn-primary {

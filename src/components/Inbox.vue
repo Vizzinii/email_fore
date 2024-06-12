@@ -6,11 +6,11 @@
           <div class="left-section">
             <div :class="['subject', email.read ? 'read' : 'unread']">{{ email.subject }}</div>
             <div class="from">{{ email.fromEmail }}</div>
-            <div v-if="email.attachment" class="attachment-indicator">📎 附件</div>
+            <div v-if="email.attachment1 || email.attachment2 || email.attachment3" class="attachment-indicator">📎 附件</div>
           </div>
           <div class="date-status">
             <div class="date">{{ formatDate(email.sentDate) }}</div>
-            <div class="status">{{ email.read ? 'Read' : 'Unread' }}</div>
+            <div :class="['status', email.read ? 'read-status' : 'unread-status']">{{ email.read ? 'Read' : 'Unread' }}</div>
           </div>
         </div>
         <div class="preview">{{ email.body.substring(0, 50) }}...</div>
@@ -49,7 +49,6 @@ export default {
         const response = await apiClient.get('/mail/inbox', { params: { toId: userId } });
         console.log('Inbox response:', response.data);
         this.emails = response.data;
-        // 检查每封邮件的 read 字段
         this.emails.forEach(email => {
           console.log(`Email ID: ${email.emailId}, Subject: ${email.subject}, read: ${email.read}`);
         });
@@ -83,15 +82,21 @@ export default {
 </script>
 
 <style scoped>
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
 .main-content {
   flex-grow: 1;
-  background-color: white;
+  background-color: #f9f9f9;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
   position: absolute;
-  left: 200px;
-  top: 50.8px;
+  left: 15%;
+  top: 60px;
   bottom: 0;
   right: 0;
 }
@@ -106,6 +111,7 @@ export default {
   padding: 15px;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .email-list li:hover {
@@ -115,7 +121,7 @@ export default {
 .email-info {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* 确保子元素靠左对齐 */
+  align-items: flex-start;
 }
 
 .left-section {
@@ -128,7 +134,7 @@ export default {
 }
 
 .email-list li .subject.unread {
-  color: #98abff;
+  color: #007bff;
 }
 
 .email-list li .subject.read {
@@ -136,25 +142,42 @@ export default {
 }
 
 .email-list li .from {
-  margin-left: 10px;
+  margin-top: 5px;
   color: #666;
+}
+
+.attachment-indicator {
+  margin-top: 5px;
+  color: #007bff;
+  font-size: 14px;
 }
 
 .date-status {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  text-align: right;
 }
 
 .email-list li .date {
   color: #666;
+  margin-bottom: 5px;
 }
 
 .email-list li .status {
-  color: #666;
+  font-weight: bold;
+}
+
+.email-list li .status.unread-status {
+  color: #007bff;
+}
+
+.email-list li .status.read-status {
+  color: gray;
 }
 
 .email-list li .preview {
+  margin-top: 10px;
   color: #666;
 }
 </style>

@@ -35,8 +35,8 @@
     box-sizing: border-box;
     overflow-y: auto;
     position: absolute;
-    left:200px;
-    top:50.8px;
+    left:15%;
+    top:60px;
     bottom: 0;
     right:0;
   }

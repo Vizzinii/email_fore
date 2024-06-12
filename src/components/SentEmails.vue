@@ -5,12 +5,17 @@
         <div class="email-info">
           <div class="left-section">
             <div :class="['subject', email.read ? 'read' : 'unread']">{{ email.subject }}</div>
-            <div class="to">To: {{ email.toEmail }} </div>
-            <div v-if="email.attachment" class="attachment-indicator">📎 附件</div>
+            <div class="to">To: {{ email.toEmail }}</div>
+            <div v-if="email.attachment1 || email.attachment2 || email.attachment3" class="attachment-indicator">📎
+              附件
+            </div>
           </div>
           <div class="date-status">
             <div class="date">{{ formatDate(email.sentDate) }}</div>
-            <div class="status">{{ email.read ? 'Read' : 'Unread' }}</div>
+            <div :class="['status', email.read ? 'read-status' : 'unread-status']">{{
+                email.read ? 'Read' : 'Unread'
+              }}
+            </div>
           </div>
         </div>
         <div class="preview">{{ email.body.substring(0, 50) }}...</div>
@@ -21,7 +26,7 @@
 
 <script>
 import apiClient from '../utils/axios';
-import { mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 import moment from 'moment';
 
 export default {
@@ -46,7 +51,7 @@ export default {
       try {
         const userId = await this.$store.dispatch('fetchUserIdByEmail', this.userEmail);
         console.log('Fetching sent emails for user ID:', userId);
-        const response = await apiClient.get('/mail/sent', { params: { fromId: userId } });
+        const response = await apiClient.get('/mail/sent', {params: {fromId: userId}});
         console.log('Sent emails response:', response.data);
         this.emails = response.data;
         console.log('Emails data assigned:', this.emails);
@@ -55,7 +60,7 @@ export default {
       }
     },
     viewEmail(email) {
-      this.$router.push({ name: 'SentEmailDetail', params: { emailId: email.emailId } });
+      this.$router.push({name: 'SentEmailDetail', params: {emailId: email.emailId}});
     },
     formatDate(date) {
       return moment(date).format('YYYY-MM-DD HH:mm');
@@ -68,15 +73,21 @@ export default {
 </script>
 
 <style scoped>
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
 .main-content {
   flex-grow: 1;
-  background-color: white;
+  background-color: #f9f9f9;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
   position: absolute;
-  left: 200px;
-  top: 50.8px;
+  left: 15%;
+  top: 60px;
   bottom: 0;
   right: 0;
 }
@@ -91,6 +102,7 @@ export default {
   padding: 15px;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .email-list li:hover {
@@ -113,7 +125,7 @@ export default {
 }
 
 .email-list li .subject.unread {
-  color: #98abff;
+  color: #007bff;
 }
 
 .email-list li .subject.read {
@@ -121,21 +133,42 @@ export default {
 }
 
 .email-list li .to {
-  margin-left: 10px;
+  margin-top: 5px;
   color: #666;
+}
+
+.attachment-indicator {
+  margin-top: 5px;
+  color: #007bff;
+  font-size: 14px;
 }
 
 .date-status {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  text-align: right;
 }
 
 .email-list li .date {
   color: #666;
+  margin-bottom: 5px;
+}
+
+.email-list li .status {
+  font-weight: bold;
+}
+
+.email-list li .status.unread-status {
+  color: #007bff;
+}
+
+.email-list li .status.read-status {
+  color: gray;
 }
 
 .email-list li .preview {
+  margin-top: 10px;
   color: #666;
 }
 </style>

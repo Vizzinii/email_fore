@@ -37,7 +37,7 @@
         { id: 2, title: 'Draft 2' },
       ];
     },
-  }, 
+  },
   };
   </script>
   
@@ -49,35 +49,18 @@
     box-sizing: border-box;
     overflow-y: auto;
     position: absolute;
-    left:200px;
-    top:50.8px;
+    left:15%;
+    top:60px;
     bottom: 0;
     right:0; 
   }
   
   .compose-form {
-    background-color: white;
-    /*display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;*/
-   /* background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 1500px;
-    width: 100%;
-    margin: auto;
-    position:absolute;
-    left:200px;
-    top:50.8px;
-    right:0px;*/
     background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
- margin-left:0px;
- width: 1400px;
-
-position: relative;
+    padding: 0;
+    border-radius: 8px;
+    width: 100%;
+    position: relative;
   }
   
   .form-group {
@@ -103,8 +86,8 @@ position: relative;
   margin-bottom: 10px;
 }
   .textarea-field {
-    width: 1500;
-  height: 500px;
+    width: 100%;
+  height: 420px;
   resize:both;
 }
   

@@ -4,26 +4,30 @@
       <form @submit.prevent="sendEmail">
         <div class="form-group">
           <label for="to">发送到:</label>
-          <input type="text" id="to" v-model="email.to" class="input-field" required />
+          <input type="email" id="to" v-model="email.to" class="input-field" placeholder="Enter recipient's email" required />
         </div>
         <div class="form-group">
           <label for="subject">主题:</label>
-          <input type="text" id="subject" v-model="email.subject" class="input-field" required />
+          <input type="text" id="subject" v-model="email.subject" class="input-field" placeholder="Enter subject" required />
         </div>
         <div class="form-group">
           <label for="body">内容:</label>
-          <textarea id="body" v-model="email.body" class="input-field textarea-field" required></textarea>
+          <textarea id="body" v-model="email.body" class="input-field textarea-field" placeholder="Type your message here" required></textarea>
         </div>
         <div class="form-group">
           <label for="attachments">附件:</label>
-          <select v-model="selectedAttachmentId" class="input-field">
-            <option :value="null">选择附件</option>
-            <option v-for="attachment in attachments" :key="attachment.attachmentId" :value="attachment.attachmentId">
-              {{ attachment.fileName }}
-            </option>
-          </select>
-          <input type="file" @change="onFileChange" class="input-field">
-          <button type="button" class="btn btn-secondary" @click="uploadAttachment">上传附件</button>
+          <div v-for="(attachment, index) in selectedAttachments" :key="index" class="attachment-group">
+            <select v-model="attachment.id" class="input-field">
+              <option :value="null">选择附件</option>
+              <option v-for="att in attachments" :key="att.attachmentId" :value="att.attachmentId">
+                {{ att.fileName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group upload-section">
+          <input type="file" @change="onFileChange" class="file-input" id="fileInput">
+          <button type="button" class="btn btn-secondary upload-btn" @click="uploadAttachment">上传附件</button>
         </div>
         <div class="button-group">
           <button type="submit" class="btn btn-primary" :disabled="sending">{{ sending ? '发送中...' : '发送' }}</button>
@@ -48,10 +52,10 @@ export default {
         subject: '',
         body: ''
       },
-      selectedAttachmentId: null,
+      selectedAttachments: [{ id: null }, { id: null }, { id: null }],
       attachments: [],
       newAttachment: null,
-      sending: false // 用于标识发送状态
+      sending: false
     };
   },
   computed: {
@@ -68,26 +72,25 @@ export default {
   methods: {
     async sendEmail() {
       console.log('Sending email with data:', this.email);
-      this.sending = true; // 开始发送，禁用按钮并更改文本
+      this.sending = true;
       try {
         const emailData = {
           ...this.email,
-          attachments: this.selectedAttachmentId ? [{ id: this.selectedAttachmentId }] : []
+          attachments: this.selectedAttachments.filter(att => att.id !== null)
         };
         const response = await apiClient.post('/mail/send', emailData);
         console.log('Email sent successfully:', response);
         alert('Email sent!');
-        // 清空输入内容
         this.email.to = '';
         this.email.subject = '';
         this.email.body = '';
-        this.selectedAttachmentId = null;
+        this.selectedAttachments = [{ id: null }, { id: null }, { id: null }];
         this.$router.push({ name: 'ComposeEmail' });
       } catch (error) {
         console.error('Error sending email:', error.response || error.message);
         alert('Failed to send email.');
       } finally {
-        this.sending = false; // 完成发送，重新启用按钮并恢复文本
+        this.sending = false;
       }
     },
     async loadAttachments() {
@@ -118,7 +121,6 @@ export default {
           },
         });
         this.attachments.push(response.data);
-        this.selectedAttachmentId = response.data.attachmentId;
         this.newAttachment = null;
       } catch (error) {
         console.error('上传失败:', error);
@@ -132,7 +134,6 @@ export default {
     }
   },
   mounted() {
-    // 处理路由传递的查询参数
     const query = this.$route.query;
     if (query.to) {
       this.email.to = query.to;
@@ -149,72 +150,89 @@ export default {
 body, html {
   height: 100%;
   margin: 0;
+  font-family: Arial, sans-serif;
 }
 
 .content-container {
   flex-grow: 1;
-  background-color: white;
+  background-color: #f9f9f9;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
   position: absolute;
-  left: 200px;
-  top: 50.8px;
+  left: 15%;
+  top: 60px;
   bottom: 0;
   right: 0;
 }
 
 .compose-form {
   background-color: #fff;
-  padding: 0;
+  padding: 20px;
   border-radius: 8px;
-  width: 100%;
-  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 80%;
+  margin: 0 auto;
 }
 
 .form-group {
-  width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
-.label {
+.form-group label {
   font-weight: bold;
   margin-bottom: 5px;
+  color: #333;
 }
 
 .input-field {
   width: 100%;
-  height: 40px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-  font-size: 16px;
-  margin-bottom: 10px;
+  font-size: 14px;
 }
 
 .textarea-field {
-  width: 100%;
-  height: 420px;
-  resize: both;
+  height: 150px;
+  resize: vertical;
+}
+
+.upload-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.file-input {
+  flex-grow: 1;
 }
 
 .button-group {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .btn {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-sizing: border-box;
+  height: 40px; /* 统一按钮高度 */
 }
 
 .btn-primary {
   background-color: #007bff;
   color: white;
+  text-align: center;
 }
 
 .btn-primary:hover {
@@ -224,9 +242,18 @@ body, html {
 .btn-secondary {
   background-color: #6c757d;
   color: white;
+  text-align: center;
 }
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.attachment-group {
+  margin-bottom: 10px;
+}
+
+.attachment-group select {
+  width: 100%;
 }
 </style>
