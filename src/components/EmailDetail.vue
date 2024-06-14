@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
+import {mapGetters, mapActions} from 'vuex';
 import apiClient from '../utils/axios';
 import moment from 'moment';
 
@@ -57,11 +57,13 @@ export default {
     ...mapGetters(['userEmail'])
   },
   methods: {
+    ...mapActions(['fetchUnreadCount']),
     async fetchEmailDetail() {
       const emailId = this.$route.params.emailId;
       try {
         const response = await apiClient.get(`/mail/${emailId}`);
         this.email = response.data;
+        this.fetchUnreadCount(); // 更新未读邮件计数
       } catch (error) {
         console.error('Error fetching email detail:', error);
       }
@@ -100,7 +102,7 @@ body, html {
 
 .content-container {
   flex-grow: 1;
-  background-color: #f9f9f9;
+  background-color: rgba(249, 249, 249, 0);
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
@@ -112,7 +114,7 @@ body, html {
 }
 
 .email-detail {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

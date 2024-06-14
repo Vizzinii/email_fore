@@ -4,7 +4,8 @@ import Home from './components/Home.vue';
 import MainContent from './components/MainContent.vue';
 import ComposeEmail from './components/ComposeEmail.vue';
 import Trash_tr from './components/Trash.vue';
-import Drafts_dr from './components/Drafts.vue';
+import Drafts from './components/Drafts.vue';
+import DraftDetail from './components/DraftDetail.vue';
 import Login from './components/Login.vue';
 import Register from './components/Register.vue';
 import Inbox from './components/Inbox.vue'; // 修改了这里的路径
@@ -77,8 +78,14 @@ const routes = [
       },
       {
         path: '/drafts',
-        name: 'Drafts_dr',
-        component: Drafts_dr,
+        name: 'Drafts',
+        component: Drafts,
+      },
+      {
+        path: '/drafts/detail/:draftId?',
+        name: 'DraftDetail',
+        component: DraftDetail,
+        props: true
       },
       {
         path: '/email/:emailId',

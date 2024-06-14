@@ -31,7 +31,7 @@
         </div>
         <div class="button-group">
           <button type="submit" class="btn btn-primary" :disabled="sending">{{ sending ? '发送中...' : '发送' }}</button>
-          <button type="button" class="btn btn-secondary" @click="cancel" :disabled="sending">取消</button>
+          <button type="button" class="btn btn-secondary" @click="saveToDrafts" :disabled="sending">保存到草稿箱</button>
         </div>
       </form>
     </div>
@@ -122,6 +122,7 @@ export default {
         });
         this.attachments.push(response.data);
         this.newAttachment = null;
+        alert('附件上传成功'); // 上传成功提示
       } catch (error) {
         console.error('上传失败:', error);
         alert('文件上传失败,请检查在附件库中是否有同名文件,请重命名文件或删除同名文件！');
@@ -130,6 +131,23 @@ export default {
     cancel() {
       if (!this.sending) {
         this.$router.push({ name: 'ComposeEmail' });
+      }
+    },
+    async saveToDrafts() {
+      const draft = {
+        fromEmail: this.email.from,
+        toEmail: this.email.to,
+        subject: this.email.subject,
+        body: this.email.body,
+        userId: this.$store.getters.userId
+      };
+      try {
+        await apiClient.post('/drafts/save', draft);
+        console.log('Draft saved successfully');
+        this.$router.push({ name: 'Drafts' });
+      } catch (error) {
+        console.error('Error saving draft:', error);
+        alert('Failed to save draft.');
       }
     }
   },
@@ -140,6 +158,9 @@ export default {
     }
     if (query.subject) {
       this.email.subject = query.subject;
+    }
+    if (query.body) {
+      this.email.body = query.body;
     }
     this.loadAttachments();
   }
@@ -155,7 +176,7 @@ body, html {
 
 .content-container {
   flex-grow: 1;
-  background-color: #f9f9f9;
+  background-color: rgba(249, 249, 249, 0);
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
@@ -167,7 +188,7 @@ body, html {
 }
 
 .compose-form {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

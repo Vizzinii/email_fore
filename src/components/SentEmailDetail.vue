@@ -88,7 +88,7 @@ body, html {
 
 .content-container {
   flex-grow: 1;
-  background-color: #f9f9f9;
+  background-color: rgba(249, 249, 249, 0);
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
@@ -100,12 +100,13 @@ body, html {
 }
 
 .email-detail {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   max-width: 80%;
   margin: 0 auto;
+  text-align: left; /* 将文本左对齐 */
 }
 
 .email-subject {

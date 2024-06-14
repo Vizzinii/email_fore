@@ -22,7 +22,7 @@
   <style>
   body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  background: url('@/assets/img/background.jpg') no-repeat center center fixed;
+  background: url('@/assets/img/background2.png') no-repeat center center fixed;
   background-size: cover;
 }
 

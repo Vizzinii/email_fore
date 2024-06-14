@@ -1,11 +1,11 @@
 import { createStore } from 'vuex';
 import apiClient from '../utils/axios';
 
-
 export default createStore({
   state: {
     user: null,
     isAuthenticated: false,
+    unreadCount: 0,
   },
   mutations: {
     setUser(state, user) {
@@ -15,15 +15,20 @@ export default createStore({
     clearUser(state) {
       state.user = null;
       state.isAuthenticated = false;
-    }
+      state.unreadCount = 0; // 清除未读邮件计数
+    },
+    setUnreadCount(state, count) {
+      state.unreadCount = count;
+    },
   },
   actions: {
-    async login({ commit }, credentials) {
+    async login({ commit, dispatch }, credentials) {
       try {
         const response = await apiClient.post('/users/login', credentials);
         if (response.status === 200) {
           commit('setUser', response.data);
           localStorage.setItem('isAuthenticated', true);
+          await dispatch('fetchUnreadCount'); // 登录后获取未读邮件计数
         } else {
           throw new Error('Login failed');
         }
@@ -38,11 +43,20 @@ export default createStore({
     async fetchUserIdByEmail({ commit }, email) {
       try {
         const response = await apiClient.get('/users/getUserIdByEmail', { params: { email } });
-        return response.data.userId; // 这里修改为userId
+        return response.data.userId;
       } catch (error) {
         throw new Error('Failed to fetch user ID');
       }
-    }
+    },
+    async fetchUnreadCount({ commit, getters }) {
+      if (!getters.userId) return;
+      try {
+        const response = await apiClient.get('/mail/unread-count', { params: { userId: getters.userId } });
+        commit('setUnreadCount', response.data);
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error);
+      }
+    },
   },
   getters: {
     isAuthenticated(state) {
@@ -53,7 +67,10 @@ export default createStore({
     },
     userEmail(state) {
       return state.user ? state.user.email : null;
-    }
+    },
+    unreadCount(state) {
+      return state.unreadCount;
+    },
   },
   modules: {},
 });

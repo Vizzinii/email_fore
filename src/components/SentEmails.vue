@@ -1,24 +1,29 @@
 <template>
   <div class="main-content">
+    <div class="header">
+      <div class="search-bar">
+        <input v-model="searchKeyword" placeholder="搜索邮件" />
+        <button @click="searchSentEmails" class="btn btn-primary">搜索</button>
+        <button @click="resetSearch" class="btn btn-secondary">重置</button>
+      </div>
+    </div>
     <ul class="email-list">
-      <li v-for="(email, index) in sortedEmails" :key="index" @click="viewEmail(email)">
+      <li v-if="sortedEmails.length === 0" class="no-emails-message">没有相关邮件！</li>
+      <li v-for="(email, index) in sortedEmails" :key="index" class="email-item" @click="viewEmail(email)">
         <div class="email-info">
-          <div class="left-section">
+          <div class="email-header">
             <div :class="['subject', email.read ? 'read' : 'unread']">{{ email.subject }}</div>
             <div class="to">To: {{ email.toEmail }}</div>
-            <div v-if="email.attachment1 || email.attachment2 || email.attachment3" class="attachment-indicator">📎
-              附件
+            <div class="attachment-placeholder">
+              <div v-if="email.attachment1 || email.attachment2 || email.attachment3" class="attachment-indicator">📎 附件</div>
             </div>
           </div>
-          <div class="date-status">
-            <div class="date">{{ formatDate(email.sentDate) }}</div>
-            <div :class="['status', email.read ? 'read-status' : 'unread-status']">{{
-                email.read ? 'Read' : 'Unread'
-              }}
-            </div>
-          </div>
+          <div class="preview">{{ email.body.substring(0, 50) }}...</div>
         </div>
-        <div class="preview">{{ email.body.substring(0, 50) }}...</div>
+        <div class="email-footer">
+          <div class="date">{{ formatDate(email.sentDate) }}</div>
+          <div :class="['status', email.read ? 'read-status' : 'unread-status']">{{ email.read ? 'Read' : 'Unread' }}</div>
+        </div>
       </li>
     </ul>
   </div>
@@ -26,14 +31,15 @@
 
 <script>
 import apiClient from '../utils/axios';
-import {mapGetters} from 'vuex';
+import { mapGetters } from 'vuex';
 import moment from 'moment';
 
 export default {
   name: 'SentEmails',
   data() {
     return {
-      emails: []
+      emails: [],
+      searchKeyword: ''
     };
   },
   computed: {
@@ -43,24 +49,28 @@ export default {
     }
   },
   methods: {
-    async fetchSentEmails() {
+    async fetchSentEmails(keyword = '') {
       if (!this.userEmail) {
         console.error('User email not available');
         return;
       }
       try {
         const userId = await this.$store.dispatch('fetchUserIdByEmail', this.userEmail);
-        console.log('Fetching sent emails for user ID:', userId);
-        const response = await apiClient.get('/mail/sent', {params: {fromId: userId}});
-        console.log('Sent emails response:', response.data);
+        const response = await apiClient.get('/mail/sent', { params: { fromId: userId, keyword } });
         this.emails = response.data;
-        console.log('Emails data assigned:', this.emails);
       } catch (error) {
         console.error('Error fetching sent emails:', error);
       }
     },
     viewEmail(email) {
-      this.$router.push({name: 'SentEmailDetail', params: {emailId: email.emailId}});
+      this.$router.push({ name: 'SentEmailDetail', params: { emailId: email.emailId } });
+    },
+    searchSentEmails() {
+      this.fetchSentEmails(this.searchKeyword);
+    },
+    resetSearch() {
+      this.searchKeyword = '';
+      this.fetchSentEmails();
     },
     formatDate(date) {
       return moment(date).format('YYYY-MM-DD HH:mm');
@@ -81,7 +91,7 @@ body, html {
 
 .main-content {
   flex-grow: 1;
-  background-color: #f9f9f9;
+  background-color: rgba(249, 249, 249, 0.25);
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
@@ -90,6 +100,61 @@ body, html {
   top: 60px;
   bottom: 0;
   right: 0;
+  padding-top: 80px; /* Adjust to give space for fixed header */
+}
+
+.header {
+  position: fixed;
+  top: 60px;
+  left: 15%;
+  right: 0;
+  background-color: #fff;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input {
+  flex-grow: 1;
+  padding: 8px;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  margin-left: 5px;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
 }
 
 .email-list {
@@ -98,77 +163,90 @@ body, html {
   margin: 0;
 }
 
-.email-list li {
+.email-item {
   padding: 15px;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.email-list li:hover {
-  background-color: #f1f1f1;
+.no-emails-message{
+  color: #ffffff;
+}
+
+.email-item:hover {
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .email-info {
+  flex-grow: 1;
+}
+
+.email-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
 }
 
-.left-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.email-list li .subject {
+.subject {
   font-weight: bold;
+  font-size: 16px;
+  color: #333;
 }
 
-.email-list li .subject.unread {
+.subject.unread {
   color: #007bff;
 }
 
-.email-list li .subject.read {
+.subject.read {
   color: gray;
 }
 
-.email-list li .to {
-  margin-top: 5px;
+.to {
   color: #666;
 }
 
-.attachment-indicator {
-  margin-top: 5px;
-  color: #007bff;
-  font-size: 14px;
-}
-
-.date-status {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+.attachment-placeholder {
+  width: 50px; /* 预留空间确保布局一致 */
   text-align: right;
 }
 
-.email-list li .date {
-  color: #666;
-  margin-bottom: 5px;
+.attachment-indicator {
+  font-size: 14px;
 }
 
-.email-list li .status {
+.preview {
+  margin-top: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+.email-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.date {
+  color: #666;
+}
+
+.status {
   font-weight: bold;
 }
 
-.email-list li .status.unread-status {
+.status.unread-status {
   color: #007bff;
 }
 
-.email-list li .status.read-status {
+.status.read-status {
   color: gray;
-}
-
-.email-list li .preview {
-  margin-top: 10px;
-  color: #666;
 }
 </style>
