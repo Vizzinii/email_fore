@@ -4,8 +4,9 @@
     <router-link to="/compose" class="nav-link" exact-active-class="active">发邮件</router-link>
     <router-link to="/inbox" class="nav-link" exact-active-class="active">收件箱{{ unreadCountDisplay }}</router-link>
     <router-link to="/sent" class="nav-link" exact-active-class="active">发件箱</router-link>
-    <router-link to="/attachments" class="nav-link" exact-active-class="active">附件箱</router-link>
     <router-link to="/drafts" class="nav-link" exact-active-class="active">草稿箱</router-link>
+    <router-link to="/attachments" class="nav-link" exact-active-class="active">附件箱</router-link>
+
   </div>
 </template>
 

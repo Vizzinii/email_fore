@@ -205,6 +205,10 @@ body, html {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.no-emails-message{
+  color: #ffffff;
+}
+
 .email-info {
   flex-grow: 1;
 }

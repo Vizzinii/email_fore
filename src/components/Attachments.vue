@@ -237,7 +237,7 @@ input[type="file"] {
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .attachments-list li a {
