@@ -154,6 +154,9 @@ body, html {
   margin: 20px 0;
   white-space: pre-wrap; /* 保持邮件正文中的换行格式 */
   color: #333;
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 20px;
+  border-radius: 8px;
 }
 
 .button-group {
