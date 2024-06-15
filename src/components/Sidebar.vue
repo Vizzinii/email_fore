@@ -24,16 +24,17 @@ export default {
   methods: {
     ...mapActions(['fetchUnreadCount']),
   },
+
   mounted() {
     this.fetchUnreadCount();
   },
-  watch: {
+  /*watch: {
     $route(to, from) {
       if (to.path === '/inbox' || from.path === '/inbox') {
         this.fetchUnreadCount();
       }
     },
-  },
+  },*/
 };
 </script>
 

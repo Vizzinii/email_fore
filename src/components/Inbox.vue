@@ -80,7 +80,7 @@ export default {
           console.error('Error updating email read status:', error);
         }
       }
-      this.fetchUnreadCount(); // 更新未读邮件计数
+      //this.fetchUnreadCount(); // 更新未读邮件计数
       this.$router.push({name: 'EmailDetail', params: {emailId: email.emailId}});
     },
     searchEmails() {
