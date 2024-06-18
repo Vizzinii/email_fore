@@ -122,10 +122,19 @@ export default {
         });
         this.attachments.push(response.data);
         this.newAttachment = null;
+        this.assignAttachmentToFirstAvailableSlot(response.data.attachmentId);
         alert('附件上传成功'); // 上传成功提示
       } catch (error) {
         console.error('上传失败:', error);
         alert('文件上传失败,请检查在附件库中是否有同名文件,请重命名文件或删除同名文件！');
+      }
+    },
+    assignAttachmentToFirstAvailableSlot(attachmentId) {
+      for (let i = 0; i < this.selectedAttachments.length; i++) {
+        if (this.selectedAttachments[i].id === null) {
+          this.selectedAttachments[i].id = attachmentId;
+          break;
+        }
       }
     },
     cancel() {

@@ -8,8 +8,13 @@
       <div class="form-group">
         <input v-model="password" type="password" placeholder="Password" required />
       </div>
+      <div class="form-group remember-me">
+        <label>
+          <input type="checkbox" v-model="rememberMe" /> Remember Me
+        </label>
+      </div>
       <div class="form-group">
-      <button type="submit" :disabled="loading">{{ loading ? 'Logging in...' : 'Login' }}</button>
+        <button type="submit" :disabled="loading">{{ loading ? 'Logging in...' : 'Login' }}</button>
       </div>
     </form>
     <p v-if="error" class="error">{{ error }}</p>
@@ -25,6 +30,7 @@ export default {
     return {
       email: '',
       password: '',
+      rememberMe: false,
       loading: false,
       error: null
     };
@@ -33,6 +39,16 @@ export default {
     const router = useRouter();
     return { router };
   },
+  mounted() {
+    // 尝试从 localStorage 读取账号和密码
+    const savedEmail = localStorage.getItem('savedEmail');
+    const savedPassword = localStorage.getItem('savedPassword');
+    if (savedEmail && savedPassword) {
+      this.email = savedEmail;
+      this.password = savedPassword;
+      this.rememberMe = true;
+    }
+  },
   methods: {
     ...mapActions(['login']),
     async loginHandle() {
@@ -40,6 +56,14 @@ export default {
       this.error = null;
       try {
         await this.login({ email: this.email, password: this.password });
+        // 如果用户选择了记住密码，将账号和密码保存到 localStorage
+        if (this.rememberMe) {
+          localStorage.setItem('savedEmail', this.email);
+          localStorage.setItem('savedPassword', this.password);
+        } else {
+          localStorage.removeItem('savedEmail');
+          localStorage.removeItem('savedPassword');
+        }
         this.router.push('/home');
       } catch (err) {
         this.error = 'Invalid email or password';
@@ -91,5 +115,13 @@ button[type="submit"]:hover {
 .error {
   color: red;
   margin-top: 10px;
+}
+
+.remember-me {
+  text-align: right;
+}
+
+.remember-me label {
+  font-size: 0.8em; /* 调整字体大小 */
 }
 </style>
