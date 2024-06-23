@@ -18,47 +18,67 @@
 </template>
 
 <script>
+import { sendMsg } from '@/services/webSocketService.mjs';
+
 export default {
   name: 'MainContent',
   data() {
     return {
       messages: [],
-      userInput: ''
+      userInput: '',
     };
   },
+  mounted() {
+    this.sendWelcomeMessage();
+  },
   methods: {
+    async sendWelcomeMessage() {
+      const welcomeMessage = "欢迎使用皮卡鱼邮箱，我是你的邮箱小助手";
+      const botMessage = {
+        id: this.messages.length + 1,
+        text: welcomeMessage,
+        user: false
+      };
+      this.messages.push(botMessage);
+      this.scrollToBottom();
+    },
     async sendMessage() {
       if (this.userInput.trim() === '') return;
       const userMessage = {
         id: this.messages.length + 1,
         text: this.userInput,
-        user: true
+        user: true,
       };
       this.messages.push(userMessage);
       this.userInput = '';
       this.scrollToBottom();
 
-      // Call the language model API
       try {
-        const response = await this.callLanguageModelAPI(userMessage.text);
-        const botMessage = {
-          id: this.messages.length + 1,
-          text: response.data.reply,
-          user: false
-        };
-        this.messages.push(botMessage);
+        const result = await sendMsg(userMessage.text);
+        console.log('Message from model:', result);
+        if (result && result.trim() !== '') {
+          const botMessage = {
+            id: this.messages.length + 1,
+            text: result,
+            user: false
+          };
+          this.messages.push(botMessage);
+        } else {
+          this.messages.push({
+            id: this.messages.length + 1,
+            text: 'No response from model.',
+            user: false
+          });
+        }
         this.scrollToBottom();
       } catch (error) {
         console.error('Error communicating with the language model:', error);
+        this.messages.push({
+          id: this.messages.length + 1,
+          text: 'Error: 无法连接到语言模型服务。',
+          user: false
+        });
       }
-    },
-    async callLanguageModelAPI(message) {
-      // Replace with actual API call
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ data: { reply: '这是语言模型的回复' } });
-        }, 1000);
-      });
     },
     scrollToBottom() {
       this.$nextTick(() => {
@@ -124,7 +144,8 @@ export default {
   margin-bottom: 10px;
   align-self: flex-end;
   max-width: 70%;
-  text-align: right; /* 右对齐文本 */
+  text-align: left; /* 右对齐文本 */
+
 }
 
 .chat-content .bot-message {

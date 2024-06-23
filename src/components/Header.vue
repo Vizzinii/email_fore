@@ -18,6 +18,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { clearConversationHistory } from '@/services/webSocketService.mjs';
 
 export default {
   name: 'Header',
@@ -35,6 +36,7 @@ export default {
     },
     exitMethod() {
       this.showConfirmDialog = false;
+      clearConversationHistory();
       this.$router.push('/');
     },
     cancelExit() {
